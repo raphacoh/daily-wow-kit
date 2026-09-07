@@ -23,6 +23,9 @@ Why two different schedulers: Cowork tasks have the Artifact tool (the ledger da
 | `{{PARENT_NAME}}` / `{{PARENT_EMAIL}}` | you |
 | `{{KID_YOUNGER}}`, `{{AGE_YOUNGER}}`, `{{GRADE_YOUNGER}}` | the younger track — name, `8–9`, `3–4` |
 | `{{KID_OLDER}}`, `{{AGE_OLDER}}`, `{{GRADE_OLDER}}` | the older track |
+| `{{MORE_KIDS}}` | empty, or e.g. `, and their cousins Dani (11, boy) and Lia (10, girl) — Sam's kids — who also use the OLDER track; Dani is on the ADVANCED level` |
+| `{{CHALLENGE_WORD}}` | the word "Challenge" in the kids' language (heading of the chapter-5 challenge panel) |
+| *(more kids)* | add them to `KIDS` in the template and to `config.kid_ids` / `kids/<id>` in the ledger; the prompts loop over `config.kid_ids`. A cousin's parent goes in `config.reports` (daily report) and as the kid's `cc`. A kid to push: `level:'advanced'`. |
 | `{{TIMEZONE}}` | `Europe/Paris` |
 | `{{HOME_COUNTRY}}` / `{{HOME_TOWN}}` | for local hooks (latitude, geology, history) |
 | `{{GITHUB_USER}}` | your GitHub username; the site repo is `{{GITHUB_USER}}/daily-wow` |

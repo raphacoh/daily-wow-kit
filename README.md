@@ -2,7 +2,7 @@
 
 **Every morning, a brand-new interactive lesson for your kids — built overnight by an AI agent, reviewed by another, approved by you, delivered by email.**
 
-A new topic each day that mixes science, engineering, maths, biology, physics, space, history and geography — told as a real story, explained with hands-on simulations the kids drive themselves, and closed with a short test whose completion unlocks a secret password they can trade with you for screen time. Two tracks (a younger and an older kid), streaks, XP, levels, badges, and an in-page assistant they can ask anything. About 25 minutes a day.
+A new topic each day that mixes science, engineering, maths, biology, physics, space, history and geography — told as a real story, explained with hands-on simulations the kids drive themselves, and closed with a short test whose completion unlocks a secret password they can trade with you for screen time. Two content tracks (younger and older) that any number of kids can share — cousins included, each addressed in their own gender, with their own parent copied on the results — an optional *advanced* level for a kid who wants to be pushed, streaks, XP, levels, badges, and an in-page assistant they can ask anything. About 25 minutes a day.
 
 <p align="center">
   <img src="docs/img/hero.png" width="49%" alt="Edition #1 — the hero screen with the predict-first slider and the track picker">
@@ -47,7 +47,7 @@ Prefer to wire things by hand? [`prompts/README.md`](prompts/README.md) document
 ## Customizing
 
 - **Language** — the template is Hebrew. The setup prompt asks Claude to translate/adapt every string and drop the RTL styles for an LTR language; for RTL languages the LTR-formula isolation (`<span class="math">`) is already there and non-negotiable.
-- **Kids** — the `KIDS` block at the top of the template holds names, gender, age and grade for the younger and older track; the markup fills itself from it. One kid: build one track.
+- **Kids** — the `KIDS` block at the top of the template is a map of kid id → `{name, f (feminine), age, grade, track:'younger'|'older', cc?, level?}`; the track picker, the name pills and every gendered string (`<span data-g="masc|fem">`, `G()` in JS) fill themselves from it. Several kids can share a track (a cousin on the older track with `cc:` their parent's email gets that parent copied on the completion mail, and a `reports` entry in the ledger config gets them a short daily report). `level:'advanced'` swaps in the harder twin of the numeric task (`data-level="advanced"` replaces `data-level="standard"`), addresses the chapter-5 challenge panel to that kid, and makes the assistant and the grader push harder. One kid: build one track.
 - **Length and difficulty** — hard rules in the builder prompt (≈1,100 words per track, 3–4 interactives, 8–10-minute test). Change the numbers, not the structure.
 - **Topics** — the menu prompt describes what makes a good candidate (2–3 domains in one story, a real person, a try-at-home moment, a local hook). Add your own constraints there.
 - **Caps and cost** — `MAX_SESSIONS_PER_DAY`, `MAX_MSGS_PER_SESSION`, `MODEL` on the proxy. A `DEMO_PASSWORD` with its own `DEMO_MAX_SESSIONS_PER_DAY` lets you share a public demo without touching your kids' quota.

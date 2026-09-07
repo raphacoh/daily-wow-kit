@@ -117,12 +117,16 @@ textarea{min-height:140px;resize:vertical;line-height:1.6}
 .track:disabled{cursor:default;opacity:.7}
 .track.on:disabled{opacity:1}
 .track .av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:"Secular One";font-size:1.05rem;color:#fff;flex:none}
-.track[data-pick=younger] .av{background:var(--nile)} .track[data-pick=older] .av{background:var(--shadow)}
-.track[data-pick=younger].on{border-color:var(--nile)} .track[data-pick=older].on{border-color:var(--shadow)}
+.track[data-trk=younger] .av{background:var(--nile)} .track[data-trk=older] .av{background:var(--shadow)}
+.track[data-trk=younger].on{border-color:var(--nile)} .track[data-trk=older].on{border-color:var(--shadow)}
 .track small{display:block;color:var(--muted)}
 body[data-track=younger] [data-track=older]{display:none!important}
 body[data-track=older] [data-track=younger]{display:none!important}
 body:not([data-track]) [data-track]{display:none!important}
+body:not([data-level=advanced]) [data-level=advanced]{display:none!important}
+body[data-level=advanced] [data-level=standard]{display:none!important}
+.challenge{border:2px dashed var(--shadow);background:var(--shadow-soft)}
+.challenge h3{color:var(--shadow)}
 .trackpill{display:inline-block;font-size:.85rem;padding:2px 10px;border-radius:999px;margin-bottom:8px}
 [data-track=younger] .trackpill{background:var(--nile-soft);color:var(--nile)}
 [data-track=older] .trackpill{background:var(--shadow-soft);color:var(--shadow)}
@@ -285,8 +289,7 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
 
   <h3>מי לומד עכשיו?</h3>
   <div class="tracks">
-    <button class="track" data-pick="younger" onclick="pickTrack('younger')"><span class="av"></span><span><b></b><small></small></span></button>
-    <button class="track" data-pick="older" onclick="pickTrack('older')"><span class="av"></span><span><b></b><small></small></span></button>
+    <!-- one button per kid, generated from KIDS -->
   </div>
   <div class="next"><button class="btn" id="startBtn" disabled onclick="startLesson()">יוצאים למסע ←</button></div>
 </section>
@@ -377,17 +380,17 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
   <div data-track="older">
     <span class="trackpill" data-kidpill="older"></span>
     <div class="panel">
-      <h3>עכשיו את ארטוסתנס. חשבי:</h3>
+      <h3 data-g="עכשיו אתה ארטוסתנס. חשוב:|עכשיו את ארטוסתנס. חשבי:">עכשיו את ארטוסתנס. חשבי:</h3>
       <p>המרחק בין אלכסנדריה לסיינה הוא בערך <b>800 ק״מ</b>, וזה בדיוק משולש אחד מהפיצה. שלב ראשון — כמה משולשים יש בפיצה?</p>
       <div class="controls">
         <label><span class="math">360 ÷ 7.2 =</span> <input type="number" id="olderDiv" placeholder="?" inputmode="decimal"></label>
-        <button class="btn small" id="olderDivBtn" onclick="checkOlderMath(1)">בדקי</button>
+        <button class="btn small" id="olderDivBtn" onclick="checkOlderMath(1)" data-g="בדוק|בדקי">בדקי</button>
       </div>
       <div id="olderStep2" style="display:none;margin-top:14px">
         <p>יפה. שלב שני — כל משולש הוא 800 ק״מ. אז כל ההיקף:</p>
         <div class="controls">
           <label><span class="math">50 × 800 =</span> <input type="number" id="olderMul" placeholder="?" inputmode="numeric"></label>
-          <button class="btn small" onclick="checkOlderMath(2)">בדקי</button>
+          <button class="btn small" onclick="checkOlderMath(2)" data-g="בדוק|בדקי">בדקי</button>
         </div>
       </div>
       <p class="cap" id="olderMathMsg" style="margin-top:10px"></p>
@@ -432,7 +435,7 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
   <div data-track="older">
     <span class="trackpill" data-kidpill="older"></span>
     <h2>למה זה בכלל עובד? סוד הקרניים המקבילות</h2>
-    <p>כל השיטה עומדת על רעיון אחד שקט: קרני השמש שמגיעות לסיינה ולאלכסנדריה <b>מקבילות</b> — מגיעות מאותו כיוון בדיוק. למה? כי השמש רחוקה מאוד: <b class="num">150,000,000</b> ק״מ. כשמקור האור רחוק כל כך, ההבדל בין הקרן שמגיעה לעיר אחת לקרן שמגיעה לעיר השנייה הוא אפסי. ואם השמש הייתה קרובה? נסי:</p>
+    <p>כל השיטה עומדת על רעיון אחד שקט: קרני השמש שמגיעות לסיינה ולאלכסנדריה <b>מקבילות</b> — מגיעות מאותו כיוון בדיוק. למה? כי השמש רחוקה מאוד: <b class="num">150,000,000</b> ק״מ. כשמקור האור רחוק כל כך, ההבדל בין הקרן שמגיעה לעיר אחת לקרן שמגיעה לעיר השנייה הוא אפסי. ואם השמש הייתה קרובה? <span data-g="נסה|נסי">נסי</span>:</p>
     <div class="panel instrument">
       <canvas id="rayCv" width="640" height="400"></canvas>
       <div class="controls">
@@ -444,6 +447,19 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
       <p class="cap" id="rayMsg" style="margin-top:12px"></p>
     </div>
     <div class="aha"><b>הגאומטריה מאחורי הקסם:</b> כשקרניים מקבילות פוגשות מקל ש"ממשיך" עד מרכז כדור הארץ, זווית הצל על האדמה <b>שווה בדיוק</b> לזווית במרכז כדור הארץ בין שתי הערים (בגאומטריה קוראים לזה זוויות מתחלפות). הצל הקטן על האדמה הוא העתק מדויק של הזווית הענקית בתוך כדור הארץ.</div>
+
+    <div class="panel challenge">
+      <h3>אתגר <span data-level="standard">(לא חובה — למי שרוצה עוד)</span><span data-level="advanced">— <span data-kidname></span>, זה בשבילך</span></h3>
+      <p><b>1. כמה ארטוסתנס באמת פספס?</b> הוא קיבל <b class="num">250,000</b> סטדיון. אם סטדיון אחד היה <span class="math">157.5</span> מטר, מה ההיקף שלו בקילומטרים? (<span class="math">250,000 × 157.5</span> מטר, ואז ÷ 1,000.) והמציאות: <b class="num">40,075</b> ק״מ — בכמה אחוזים הוא פספס?</p>
+      <div class="controls">
+        <label>ההיקף שלו בק״מ <input type="number" id="chalKm" inputmode="numeric" placeholder="?"></label>
+        <label>הסטייה באחוזים <input type="number" id="chalPct" inputmode="decimal" step="0.1" placeholder="?"></label>
+        <button class="btn small" onclick="checkChallenge()" data-g="בדוק|בדקי">בדקי</button>
+      </div>
+      <div class="fb" id="chalFb"></div>
+      <p style="margin-top:14px"><b>2. שאלה למחשבה:</b> למה חשוב ששתי הערים יהיו בערך על אותו קו אורך (אחת בדיוק צפונית לשנייה)? מה היה קורה לחישוב אם אלכסנדריה הייתה גם 500 ק״מ מזרחה?</p>
+      <details><summary>הרמז והתשובה</summary><p>המרחק שצריך בנוסחה הוא המרחק <b>צפון–דרום</b> בלבד — כי הזווית שמדדנו היא הזווית בין שני קווי רוחב. אם אלכסנדריה הייתה גם מזרחה, המרחק בין הערים היה גדול יותר מהמרחק הצפון–דרום, והחישוב <span class="math">50 × מרחק</span> היה נותן היקף גדול מדי. ארטוסתנס ידע זאת — והניח (כמעט נכון) שסיינה נמצאת בדיוק דרומית לאלכסנדריה.</p></details>
+    </div>
   </div>
 
   <div data-track="younger">
@@ -519,9 +535,14 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
     <div class="controls"><label><span class="math">360 ÷ 36 =</span> <input type="number" id="numYounger" inputmode="numeric" placeholder="?"></label><button class="btn small" onclick="checkNum('younger')">בדוק</button></div>
     <div class="fb" id="numFbYounger"></div>
   </div>
-  <div class="q" data-track="older">
+  <div class="q" data-track="older" data-level="advanced">
+    <div class="qt">חישוב: על כוכב לכת דמיוני יש שתי ערים במרחק <b>1,200 ק״מ</b> זו מזו, אחת בדיוק צפונית לשנייה. בצהריים, בעיר אחת המקל בלי צל, ובשנייה זווית הצל היא <span class="math">4.8°</span>. מה ההיקף של כוכב הלכת — ומה <b>הרדיוס</b> שלו בקירוב? (<span class="math">π ≈ 3.14</span>, <span class="math">R = C ÷ 2π</span>.) כתבו את ההיקף:</div>
+    <div class="controls"><label>ההיקף בק״מ <input type="number" id="numAdv" inputmode="numeric" placeholder="?"></label><label>הרדיוס בק״מ (בקירוב) <input type="number" id="numAdvR" inputmode="numeric" placeholder="?"></label><button class="btn small" onclick="checkNum('adv')" data-g="בדוק|בדקי">בדקי</button></div>
+    <div class="fb" id="numFbAdv"></div>
+  </div>
+  <div class="q" data-track="older" data-level="standard">
     <div class="qt">חישוב: על כוכב לכת דמיוני יש שתי ערים במרחק <b>1,000 ק״מ</b> זו מזו. בצהריים, בעיר אחת אין צל, ובשנייה זווית הצל היא <span class="math">9°</span>. מה ההיקף של כוכב הלכת?</div>
-    <div class="controls"><label>ההיקף בק״מ <input type="number" id="numOlder" inputmode="numeric" placeholder="?"></label><button class="btn small" onclick="checkNum('older')">בדקי</button></div>
+    <div class="controls"><label>ההיקף בק״מ <input type="number" id="numOlder" inputmode="numeric" placeholder="?"></label><button class="btn small" onclick="checkNum('older')" data-g="בדוק|בדקי">בדקי</button></div>
     <div class="fb" id="numFbOlder"></div>
   </div>
 
@@ -626,7 +647,7 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
   <div class="card">
     <div class="disc" aria-hidden="true"></div>
     <h2>הוואו היומי</h2>
-    <p>הדף הזה הוא רק <span id="gateNames"></span>. מה סיסמת הכניסה? (זו שאבא ואמא נתנו לכם — לא הסיסמה הסודית של היום.)</p>
+    <p>הדף הזה הוא רק <span id="gateNames"></span>. מה סיסמת הכניסה? היא כתובה במייל של הוואו היומי (זו לא הסיסמה הסודית של היום).</p>
     <form onsubmit="return gateSubmit(event)">
       <input id="gateIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="סיסמת כניסה" aria-label="סיסמת כניסה">
       <button class="btn" type="submit">כניסה</button>
@@ -640,8 +661,14 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
 <script>
 /* ---------- edition data (the nightly bot fills these from the parents' ledger) ---------- */
 const EDITION = { n:1, code:'WOW-001', date:'2026-09-07', title:'המקל שמדד את כדור הארץ', parent:'parent@example.com' };
-/* the two tracks: ids are fixed (younger = younger track, older = older track); names, gender and age come from here */
-const KIDS = { younger:{ name:'יובל', f:false, age:'8–9', grade:'ג–ד' }, older:{ name:'נועה', f:true, age:'10–11', grade:'ה–ו' } };
+/* kids: id → name, gender (f), age, grade, which CONTENT TRACK they use ('younger' and 'older' — several kids can share a track), an optional cc for their parent on the completion mail, and an optional level:'advanced' (elements with data-level="advanced" replace their data-level="standard" twins; the assistant and the grader push harder). Track ids are fixed; kids are not. */
+const KIDS = {
+  younger: { name:'יובל', f:false, age:'8–9',   grade:'ג–ד', track:'younger' },
+  older:   { name:'נועה', f:true,  age:'10–11', grade:'ה–ו', track:'older' },
+  // more kids can share a track — e.g. a cousin on the older track whose parent gets a cc of the completion mail,
+  // and an especially strong kid on the ADVANCED level (harder twin of the numeric task, the challenge addressed to them, a pushier assistant/grader):
+  // dani: { name:'דני', f:false, age:'11', grade:'ו', track:'older', cc:'their.parent@example.com', level:'advanced' },
+};
 const STATS = { younger:{ streak:0, best:0, xp:0, badges:[] }, older:{ streak:0, best:0, xp:0, badges:[] } };
 const PW_ENC = '15DXmNeRINec16kg15zXpteU'; // base64 of the reversed password
 const LEVELS = [ [0,'סקרן','סקרנית'], [150,'חוקר צעיר','חוקרת צעירה'], [400,'מגלה','מגלה'], [800,'מדען','מדענית'], [1500,'פרופסור','פרופסורית'], [2500,'גאון','גאונית'], [4000,'אגדה','אגדה'] ];
@@ -651,19 +678,18 @@ const PROXY = { url:'https://arto-proxy.vercel.app/api', pwHash:'2a97516c354b688
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use==='function');   // opened inside Claude (review copy) vs. the public site
 
 /* ---------- state ---------- */
-const S = { track:null, started:false, step:0, guess:20000, world:'flat', qc:{}, mcq:{}, order:[], orderScore:null, num:null, explain:0, explainText:'', slices:0, sieveDone:false, explainGraded:false, olderStep1:false };
+const S = { kid:null, track:null, started:false, challenge:false, step:0, guess:20000, world:'flat', qc:{}, mcq:{}, order:[], orderScore:null, num:null, explain:0, explainText:'', slices:0, sieveDone:false, explainGraded:false, olderStep1:false };
 const KEY='wow-'+EDITION.code;
 const fmt = n => Math.round(n).toLocaleString('he-IL');
 const FLAME = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 1-3s0 3 2 3c2 0 1-4 2-10z"/></svg>';
-const KID = () => KIDS[S.track] || KIDS.younger;
+const KID = () => KIDS[S.kid] || KIDS.younger;
 const F = () => !!KID().f;                          // feminine?
 const G = (m,f) => F()? f : m;                     // gendered string
 const NAME = () => KID().name;
 /* names in the static markup come from KIDS */
-document.querySelectorAll('.track').forEach(b=>{ const k=KIDS[b.dataset.pick]; if(!k) return; b.querySelector('.av').textContent=k.name; b.querySelector('b').textContent=k.name; b.querySelector('small').textContent='המסלול של '+k.name; });
-document.querySelectorAll('[data-kidname]').forEach(el=>{ const k=KIDS[el.dataset.kidname]; if(k) el.textContent=k.name; });
-document.querySelectorAll('[data-kidpill]').forEach(el=>{ const k=KIDS[el.dataset.kidpill]; if(k) el.textContent='המסלול של '+k.name; });
-document.getElementById('gateNames').textContent = Object.values(KIDS).map(k=>'ל'+k.name).join(' ו');
+document.querySelector('.tracks').innerHTML = Object.entries(KIDS).map(([id,k])=>'<button class="track" data-pick="'+id+'" data-trk="'+k.track+'" onclick="pickKid(\''+id+'\')"><span class="av">'+esc(k.name)+'</span><span><b>'+esc(k.name)+'</b><small>'+(k.track==='younger'?'המסלול הצעיר':'המסלול הבוגר')+'</small></span></button>').join('');
+function fillKidStrings(){ const k=KID(); document.querySelectorAll('[data-kidpill]').forEach(el=>{ el.textContent='המסלול של '+k.name; }); document.querySelectorAll('[data-kidname]').forEach(el=>{ el.textContent=k.name; }); document.querySelectorAll('[data-g]').forEach(el=>{ const [m,f]=el.dataset.g.split('|'); el.textContent = k.f ? f : m; }); }
+document.getElementById('gateNames').textContent = (()=>{ const n=Object.values(KIDS).map(k=>'ל'+k.name); return n.length>1 ? n.slice(0,-1).join(', ')+' ו'+n[n.length-1] : n[0]; })();
 /* the library of past editions lives at <site>/e/ — from an archived copy (…/e/NNN/) that is ../, from the root it is e/ */
 const LIB_URL = /\/e\/\d{3}\/?(index\.html)?$/.test(location.pathname) ? '../' : 'e/';
 document.querySelectorAll('.libLink').forEach(a=>{ a.href=LIB_URL; a.hidden=IN_CLAUDE; });
@@ -688,21 +714,22 @@ function goTo(n){
   if(n===6) buildSieve(); if(n===7) buildTest();
   save();
 }
-function pickTrack(t){
-  if(S.started) return;
-  S.track = t; document.body.dataset.track = t;
-  document.querySelectorAll('.track').forEach(b=>b.classList.toggle('on', b.dataset.pick===t));
-  const st=STATS[t]||{streak:0,xp:0}, lv=levelFor(st.xp, t==='older');
+function pickKid(id){
+  if(S.started || !KIDS[id]) return;
+  S.kid = id; S.track = KIDS[id].track; document.body.dataset.track = S.track; document.body.dataset.kid = id; document.body.dataset.level = KIDS[id].level||'standard';
+  document.querySelectorAll('.track').forEach(b=>b.classList.toggle('on', b.dataset.pick===id));
+  fillKidStrings();
+  const st=STATS[id]||{streak:0,xp:0}, lv=levelFor(st.xp, F());
   document.getElementById('who').innerHTML = '<b>'+NAME()+'</b><span class="statpill" title="רצף ימים"><span class="flame">'+FLAME+'</span><span class="num">'+st.streak+'</span></span><span class="statpill lvl" title="רמה">'+lv.name+'</span>';
   document.getElementById('startBtn').disabled = false;
   save();
 }
-function startLesson(){ if(!S.track) return; S.started=true; document.querySelectorAll('.track').forEach(b=>b.disabled=true); document.getElementById('startBtn').disabled=true; next(); }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify({track:S.track, guess:S.guess})); }catch(e){} }
+function startLesson(){ if(!S.kid) return; S.started=true; document.querySelectorAll('.track').forEach(b=>b.disabled=true); document.getElementById('startBtn').disabled=true; next(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({kid:S.kid, guess:S.guess})); }catch(e){} }
 function restore(){
   try{ const d = JSON.parse(localStorage.getItem(KEY)||'null'); if(!d) return;
     if(d.guess){ S.guess=d.guess; guess.value=d.guess; guessOut.textContent=fmt(d.guess); }
-    if(d.track){ pickTrack(d.track); } }catch(e){}
+    if(d.kid && KIDS[d.kid]){ pickKid(d.kid); } }catch(e){}
 }
 function restart(){ try{localStorage.removeItem(KEY);}catch(e){} location.reload(); }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
@@ -975,7 +1002,19 @@ function checkOrder(){ const o=S.order; const pos=id=>o.indexOf(id);
   document.querySelectorAll('#order .card').forEach(c=>{ const id=c.dataset.id, p=pos(id); const good = (id==='a'&&p===0)||(id==='e'&&p===4)||(id==='b'&&p<pos('c'))||(id==='c'&&p>pos('b')&&p<4)||(id==='d'&&p>0&&p<4); c.classList.add(good?'ok':'ko'); });
   orderFb.innerHTML = ok ? '<span class="pill-ok">סדר מושלם!</span> תצפית (אין צל בסיינה) ← מדידה (7.2°) ← חישוב (50) ← מרחק ← היקף. ככה עובד מדע: קודם שמים לב למשהו מוזר, ואז מודדים.' : '<span class="pill-bad">כמעט.</span> הסדר הנכון: קודם התצפית על הבאר (בלי זה אין שאלה!), אחר כך מדידת הזווית, אז החלוקה <span class="math">360 ÷ 7.2</span>, המרחק בין הערים, ובסוף הכפל שנותן 40,000 ק״מ. (את המרחק אפשר למדוד גם קודם — העיקר שהכפל בסוף.)';
   orderFb.classList.add('show'); }
-function checkNum(t){ const v=+document.getElementById(t==='younger'?'numYounger':'numOlder').value, fb=document.getElementById(t==='younger'?'numFbYounger':'numFbOlder');
+function checkChallenge(){
+  const km=+chalKm.value, pct=+chalPct.value, fb=document.getElementById('chalFb'); fb.classList.add('show');
+  const kmOk = Math.abs(km-39375)<=400, pctOk = Math.abs(pct-1.7)<=0.6 || Math.abs(pct-1)<=0.6;
+  fb.innerHTML = (kmOk&&pctOk) ? '<span class="pill-ok">מרשים.</span> <span class="math">250,000 × 157.5 = 39,375,000</span> מטר = <span class="math">39,375</span> ק״מ. הסטייה: <span class="math">(40,075 − 39,375) ÷ 40,075 ≈ 1.7%</span>. עם סטדיון של 185 מטר הוא היה מקבל 46,250 ק״מ — סטייה של 15%. כל הוויכוח בין ההיסטוריונים הוא על אורך הסטדיון.'
+    : kmOk ? '<span class="pill-ok">ההיקף נכון</span> — <span class="math">39,375</span> ק״מ. עכשיו האחוזים: <span class="math">(40,075 − 39,375) ÷ 40,075 × 100</span>.'
+    : '<span class="pill-bad">עוד לא.</span> רמז: <span class="math">250,000 × 157.5</span> נותן מטרים; חלקו ב־1,000 כדי לקבל קילומטרים.';
+  S.challenge = kmOk&&pctOk;
+}
+function checkNum(t){
+  if(t==='adv'){ const c=+numAdv.value, r=+numAdvR.value, fb=document.getElementById('numFbAdv'); const cOk=c===90000, rOk=Math.abs(r-14331)<=400; S.num=cOk?2:(S.num===2?2:0);
+    fb.innerHTML = cOk ? '<span class="pill-ok">נכון!</span> <span class="math">360 ÷ 4.8 = 75</span>, ואז <span class="math">75 × 1,200 = 90,000</span> ק״מ — כוכב לכת גדול פי יותר מ־2 מכדור הארץ.'+(rOk?' והרדיוס: <span class="math">90,000 ÷ 6.28 ≈ 14,300</span> ק״מ. מדויק.':' הרדיוס: <span class="math">R = 90,000 ÷ (2 × 3.14) ≈ 14,300</span> ק״מ.') : '<span class="pill-bad">לא בדיוק.</span> קודם: כמה "משולשים" של <span class="math">4.8°</span> נכנסים ב־<span class="math">360°</span>? ואז כפול המרחק.';
+    fb.classList.add('show'); return; }
+  const v=+document.getElementById(t==='younger'?'numYounger':'numOlder').value, fb=document.getElementById(t==='younger'?'numFbYounger':'numFbOlder');
   if(t==='younger'){ const ok=v===10; S.num=ok?2:(S.num===2?2:0); fb.innerHTML= ok?'<span class="pill-ok">נכון!</span> 10 משולשים. זווית גדולה = מעט משולשים = הערים רחוקות מאוד זו מזו על הכדור.':'<span class="pill-bad">לא בדיוק.</span> רמז: <span class="math">36 × 10 = 360</span>. אז <span class="math">360 ÷ 36 = 10</span>.'; }
   else { const ok=v===40000; S.num=ok?2:(S.num===2?2:0); fb.innerHTML= ok?'<span class="pill-ok">מדויק!</span> <span class="math">360 ÷ 9 = 40</span> פרוסות, ואז <span class="math">40 × 1,000 = 40,000</span> ק״מ. כוכב לכת בדיוק בגודל של כדור הארץ — רק שהערים שם רחוקות יותר.':'<span class="pill-bad">לא בדיוק.</span> שלב א: <span class="math">360 ÷ 9 = ?</span> (כמה פרוסות). שלב ב: להכפיל ב־1,000 ק״מ.'; }
   fb.classList.add('show'); }
@@ -1060,7 +1099,7 @@ async function gradeExplain(){
   const mode = await AI.init();
   if(mode!=='none'){
     try{
-      const who = F()?'ילדה בכיתה '+KID().grade+' (בת '+KID().age+')':'ילד בכיתה '+KID().grade+' (בן '+KID().age+')';
+      const who = (F()?'ילדה בכיתה '+KID().grade+' (בת '+KID().age+')':'ילד בכיתה '+KID().grade+' (בן '+KID().age+')') + (KID().level==='advanced'?' — ברמה מתקדמת: דרוש/י הסבר מלא של המכניזם (קרניים מקבילות, זוויות מתחלפות, למה מחלקים 360 בזווית) ולא רק את הסיפור':'');
       const prompt = 'את/ה מורה חם/ה ומעודד/ת ל'+who+'. הילד/ה למד/ה היום איך ארטוסתנס מדד את היקף כדור הארץ. הרעיונות המרכזיים: (1) בסיינה ב־21 ביוני בצהריים אין צל, באלכסנדריה יש צל בזווית 7.2°; (2) זה קורה כי כדור הארץ עקום וקרני השמש מקבילות; (3) 360 ÷ 7.2 = 50, כלומר המרחק בין הערים הוא 1/50 מההיקף; (4) המרחק כ־800 ק״מ נמדד על ידי סופרי צעדים; (5) 50 × 800 = 40,000 ק״מ.\n\nההסבר של הילד/ה:\n"""'+txt+'"""\n\nהחזר/י JSON בלבד, בלי טקסט נוסף: {"stars": 1|2|3, "praise": "משפט אחד ספציפי על מה שהיה טוב בהסבר", "missing": ["רעיון חסר או לא מדויק, בקצרה"], "tip": "משפט אחד מעודד שמכוון להשלמה"}. missing: עד 2 פריטים, יכול להיות ריק. stars: 3 אם הרעיון המרכזי מובן (צל שונה בשתי ערים בגלל עקמומיות + חלוקה של 360 בזווית + כפל במרחק), 2 אם חלק מהרעיון, 1 אם רק התחלה. כתוב/כתבי בעברית פשוטה ובגובה העיניים, '+(F()?'בלשון נקבה':'בלשון זכר')+', בלי להעליב. חישובים כותבים משמאל לימין.';
       const r = await AI.json(prompt);
       const stars=Math.max(1,Math.min(3,+r.stars||1)); S.explain=stars;
@@ -1108,7 +1147,7 @@ function finish(){
   }
 
   /* XP & level (same formula the nightly bot uses) */
-  const st = STATS[S.track]||{streak:0,best:0,xp:0,badges:[]};
+  const st = STATS[S.kid]||{streak:0,best:0,xp:0,badges:[]};
   const streakAfter = (complete && !LATE) ? st.streak+1 : st.streak;
   const xpBase = total*10, xpDone = complete?20:0, xpStreak = (complete && !LATE)?Math.min(50, streakAfter*5):0, xpToday = xpBase+xpDone+xpStreak;
   document.getElementById('xpToday').textContent='+'+xpToday;
@@ -1133,6 +1172,7 @@ function finish(){
   if(ex===3) earned.push(['★','המורה']);
   if(diff<0.15) earned.push(['≈','ניחוש חד']);
   if(S.sieveDone) earned.push(['ר','המסננת']);
+  if(S.challenge) earned.push(['Σ','האתגר']);
   if(complete && !LATE && [3,7,14,30,100].includes(streakAfter)) earned.push(['🔥','רצף '+streakAfter]);
   badgesTitle.textContent='תגים שזכית בהם היום';
   const bb=document.getElementById('badges'); bb.innerHTML = earned.map(b=>'<span class="badge new"><span class="dot">'+b[0]+'</span>'+b[1]+'</span>').join('');
@@ -1140,11 +1180,11 @@ function finish(){
   S.game={complete, xpToday, streakAfter, badges:earned.map(b=>b[1])};
 
   /* one-tap report to the parent */
-  mailBtn.href = 'mailto:'+EDITION.parent+'?subject='+encodeURIComponent('הוואו היומי #'+EDITION.n+' · סיום · '+name)+'&body='+encodeURIComponent(summaryText());
+  mailBtn.href = 'mailto:'+EDITION.parent+'?'+(KID().cc?'cc='+encodeURIComponent(KID().cc)+'&':'')+'subject='+encodeURIComponent('הוואו היומי #'+EDITION.n+' · סיום · '+name)+'&body='+encodeURIComponent(summaryText());
 }
 function summaryText(){
   const r=S.result||{total:0,max:11,pct:0}, g=S.game||{};
-  return 'הוואו היומי #'+EDITION.n+' · '+EDITION.title+'\n'+NAME()+': '+r.total+'/'+r.max+' נקודות ('+r.pct+'%)'+(g.complete?' · המבחן הושלם ✓':' · המבחן לא הושלם')+'\nXP היום: +'+(g.xpToday||0)+(g.badges&&g.badges.length?' · תגים: '+g.badges.join(', '):'')+'\nהניחוש שלי להיקף כדור הארץ: '+fmt(S.guess)+' ק״מ (המציאות: 40,075)\n'+(S.explainText?'ההסבר שלי: '+S.explainText+'\n':'')+'\n'+EDITION.code+'|'+(S.track||'')+'|'+r.total+'|'+r.max+'|'+(g.complete?'done':'partial')+(LATE?'|late':'');
+  return 'הוואו היומי #'+EDITION.n+' · '+EDITION.title+'\n'+NAME()+': '+r.total+'/'+r.max+' נקודות ('+r.pct+'%)'+(g.complete?' · המבחן הושלם ✓':' · המבחן לא הושלם')+'\nXP היום: +'+(g.xpToday||0)+(g.badges&&g.badges.length?' · תגים: '+g.badges.join(', '):'')+'\nהניחוש שלי להיקף כדור הארץ: '+fmt(S.guess)+' ק״מ (המציאות: 40,075)\n'+(S.explainText?'ההסבר שלי: '+S.explainText+'\n':'')+'\n'+EDITION.code+'|'+(S.kid||'')+'|'+r.total+'|'+r.max+'|'+(g.complete?'done':'partial')+(LATE?'|late':'');
 }
 async function copyResults(){
   const txt=summaryText();
@@ -1153,12 +1193,13 @@ async function copyResults(){
 }
 
 /* ---------- Arto, the assistant ---------- */
-const LESSON_CONTEXT = 'השיעור של היום: "המקל שמדד את כדור הארץ" — איך ארטוסתנס (מנהל הספרייה הגדולה של אלכסנדריה, לפני כ־2,200 שנה) מדד את היקף כדור הארץ. העובדות: (1) בסיינה (אסואן של היום), ב־21 ביוני בצהריים, השמש בדיוק מעל הראש — מאירה את קרקעית באר עמוקה ואין צל. (2) באלכסנדריה, באותו רגע, למקל יש צל בזווית 7.2°. (3) זה אפשרי רק כי כדור הארץ עקום; קרני השמש מקבילות כי השמש רחוקה מאוד (150 מיליון ק״מ). (4) 360 ÷ 7.2 = 50, כלומר המרחק בין הערים הוא 1/50 מההיקף. (5) המרחק (כ־800 ק״מ, 5,000 סטדיון) נמדד על ידי סופרי צעדים מקצועיים — במטיסטים. (6) 50 × 800 = 40,000 ק״מ; המדידה המודרנית: 40,075 ק״מ. הדיוק תלוי באורך הסטדיון (1%–16% סטייה). הוכחה שהעולם עגול: ספינה נעלמת מלמטה; צל עגול על הירח בליקוי. חיבורים: קו רוחב הוא זווית (אלכסנדריה 31°, תל אביב 32°); מנהרות שנפגשות באמצע; היוונים העריכו את גודל הירח מהצל בליקוי; המסננת של ארטוסתנס למספרים ראשוניים; כינויו "בטא"; הוא המציא את המילה "גאוגרפיה". האינטראקציות בעמוד: ספינה על עולם שטוח/עגול, מחוון "כמה העולם עקום?" עם שני מקלות, פיצת המשולשים, מחשבון צעדים, סימולציית מרחק השמש ('+KIDS.older.name+'), מחשבון צל למדידה בבית ('+KIDS.younger.name+'), משחק המסננת (בונוס). במבחן: 4 שאלות, סידור שלבים, חישוב, והסבר במילים שלהם.';
+const LESSON_CONTEXT = 'השיעור של היום: "המקל שמדד את כדור הארץ" — איך ארטוסתנס (מנהל הספרייה הגדולה של אלכסנדריה, לפני כ־2,200 שנה) מדד את היקף כדור הארץ. העובדות: (1) בסיינה (אסואן של היום), ב־21 ביוני בצהריים, השמש בדיוק מעל הראש — מאירה את קרקעית באר עמוקה ואין צל. (2) באלכסנדריה, באותו רגע, למקל יש צל בזווית 7.2°. (3) זה אפשרי רק כי כדור הארץ עקום; קרני השמש מקבילות כי השמש רחוקה מאוד (150 מיליון ק״מ). (4) 360 ÷ 7.2 = 50, כלומר המרחק בין הערים הוא 1/50 מההיקף. (5) המרחק (כ־800 ק״מ, 5,000 סטדיון) נמדד על ידי סופרי צעדים מקצועיים — במטיסטים. (6) 50 × 800 = 40,000 ק״מ; המדידה המודרנית: 40,075 ק״מ. הדיוק תלוי באורך הסטדיון (1%–16% סטייה). הוכחה שהעולם עגול: ספינה נעלמת מלמטה; צל עגול על הירח בליקוי. חיבורים: קו רוחב הוא זווית (אלכסנדריה 31°, תל אביב 32°); מנהרות שנפגשות באמצע; היוונים העריכו את גודל הירח מהצל בליקוי; המסננת של ארטוסתנס למספרים ראשוניים; כינויו "בטא"; הוא המציא את המילה "גאוגרפיה". האינטראקציות בעמוד: ספינה על עולם שטוח/עגול, מחוון "כמה העולם עקום?" עם שני מקלות, פיצת המשולשים, מחשבון צעדים, סימולציית מרחק השמש (המסלול הבוגר), מחשבון צל למדידה בבית (המסלול הצעיר), משחק המסננת (בונוס). במבחן: 4 שאלות, סידור שלבים, חישוב, והסבר במילים שלהם.';
 const CHIPS = ['לא הבנתי למה יש צל באלכסנדריה', 'מה זה בעצם זווית?', 'איך ידעו שהשמש רחוקה?', 'ספר לי עוד על הספרייה של אלכסנדריה', 'מה עוד אפשר למדוד עם צל?'];
 let chatHistory=[], chatBusy=false, chatInit=false, chatRec=null;
 function personaPrompt(){
-  const k = KIDS[S.track];
-  const kid = !k ? 'ילד או ילדה בגילאי 8–11.' : k.f ? k.name+', ילדה בת '+k.age+' (כיתה '+k.grade+'). פנה אליה בלשון נקבה.' : k.name+', ילד בן '+k.age+' (כיתה '+k.grade+'). פנה אליו בלשון זכר'+(S.track==='younger'?', במשפטים קצרים במיוחד.':'.');
+  const k = KIDS[S.kid];
+  const kid = (!k ? 'ילד או ילדה בגילאי 8–11.' : k.f ? k.name+', ילדה בת '+k.age+' (כיתה '+k.grade+'). פנה אליה בלשון נקבה.' : k.name+', ילד בן '+k.age+' (כיתה '+k.grade+'). פנה אליו בלשון זכר'+(S.track==='younger'?', במשפטים קצרים במיוחד.':'.'))
+    + (k&&k.level==='advanced' ? ' חשוב: '+(k.f?'היא חדה במיוחד ואוהבת אתגר — אל תפשטי בשבילה':'הוא חד במיוחד ואוהב אתגר — אל תפשט בשבילו')+'. תן את ההסבר המלא (כולל הגאומטריה והנוסחה), שאל שאלות המשך שדורשות חשיבה, הצע את הגרסה הקשה של כל רעיון, והזמן לנמק ולהוכיח.' : '');
   return 'אתה ארטו — ספרן חכם, סבלני וקצת מצחיק מהספרייה הגדולה של אלכסנדריה, שמלווה ילדים ב"הוואו היומי". המשתמש/ת: '+kid+'\n'+LESSON_CONTEXT+'\n\nכללים: כתוב בעברית פשוטה, חמה, בגובה העיניים. 2–5 משפטים בכל תשובה (יותר רק אם מבקשים סיפור). תמיד הסבר עם דוגמה מהחיים של ילדים (כדורגל, פיצה, חצר, אופניים). כשהילד/ה שואל/ת על שאלה מהמבחן — אל תיתן את התשובה; תן רמז או שאלה מכוונת. אם שואלים מעבר לשיעור (חלל, היסטוריה, מתמטיקה, כל דבר) — ענה בשמחה ובדיוק מדעי, וחבר בחזרה לנושא אם אפשר. דבר רק על נושאים שמתאימים לילדים; אם עולה משהו לא מתאים, החזר בעדינות לשיעור. חישובים כותבים תמיד משמאל לימין, למשל 360 ÷ 7.2 = 50. אל תשתמש באמוג׳י. סיים לפעמים בשאלה קטנה שמזמינה להמשיך לחשוב. אל תמציא עובדות; אם אינך בטוח, אמור זאת.';
 }
 function openChat(){ chat.classList.add('open'); fab.style.display='none'; if(!chatInit){ chatInit=true; initChat(); } chatIn.focus(); }
@@ -1169,7 +1210,7 @@ function askChip(b){ chatIn.value=b.textContent; sendChat(); }
 function fmtBot(t){ let h=esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>'); h=h.replace(/(\d[\d.,]*\s*(?:[÷×+\-−=]\s*[\d.,]*[%°]?\s*)+)/g, m=>'<span class="math">'+m.trim()+'</span>'); return h; }
 function chatOff(placeholder){ chatIn.disabled=true; chatSend.disabled=true; chatMic.disabled=true; chatIn.placeholder=placeholder||'ארטו לא זמין עכשיו'; chips.innerHTML=''; }
 async function initChat(){
-  const name = S.track?NAME():'';
+  const name = S.kid?NAME():'';
   const mode = await AI.init();
   if(mode==='none'){
     addMsg('bot','שלום'+(name?' '+name:'')+'! אני ארטו, הספרן. בדפדפן הזה אני לא יכול לענות על שאלות, אבל הנה תשובות לשתי השאלות הנפוצות:');

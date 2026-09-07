@@ -16,7 +16,7 @@ You are going to set up and run **"The Daily Wow"** for my kids: an agent that e
 
 ## 0. My family (fill-ins)
 
-- Kids: `[Name 1]`, `[age, e.g. 8–9]`, `[boy/girl]`, grade `[e.g. 3–4]` — the **younger track**; and `[Name 2]`, `[age]`, `[boy/girl]`, grade `[e.g. 5–6]` — the **older track**. *(One kid is fine — then build one track.)*
+- Kids: `[Name 1]`, `[age, e.g. 8–9]`, `[boy/girl]`, grade `[e.g. 3–4]` — the **younger track**; and `[Name 2]`, `[age]`, `[boy/girl]`, grade `[e.g. 5–6]` — the **older track**. *(One kid is fine — then build one track. More kids are fine too — each one is an entry in the template's `KIDS` map with a `track`; a cousin gets `cc: [their parent's email]` so that parent is copied on the completion mail and receives a short daily report. Mark a kid you want pushed harder with `level:'advanced'`: they get the harder twin of the numeric task, the challenge panel addressed to them, and a pushier assistant and grader.)*
 - Language of the kids' site and of the emails to the kids: `[Hebrew / French / English / …]`. Language of the emails to me: `[English / French / …]`.
 - Time zone: `[e.g. Europe/Paris]`. Where we live (for local hooks): `[town, country]`.
 - My name and email (review + reports): `[Name]`, `[parent@example.com]`. Kids' email(s) for the daily edition: `[kid@example.com]` (leave empty to send everything to me for now).

@@ -27,8 +27,9 @@ Everything is built so that **no server of yours is ever needed** for the site i
 
 A `<title>` + `<link>` (Google Fonts) + `<style>` + markup fragment (the release routine wraps it in a
 full `<html lang dir>` document). Constants at the top of the script are all an edition needs to know:
-`EDITION` (number, code, date, title, parent email), `KIDS` (names, gender, age, grade for the two
-tracks — the markup fills itself from it), `STATS` (each kid's streak/XP/badges as of yesterday),
+`EDITION` (number, code, date, title, parent email), `KIDS` (kid id → name, gender, age, grade, content
+track, optional parent `cc`, optional `level:'advanced'` — any number of kids, the markup fills itself from
+it), `STATS` (each kid's streak/XP/badges as of yesterday),
 `PW_ENC` (the daily password, base64 of the reversed UTF-8 string), `PROXY` (proxy URL + SHA-256 of the
 entrance password; both empty = no gate and no assistant on the public site), `LEVELS`. Then: a sticky
 progress bar, sequential `.step` sections revealed by `goTo(n)`, quick-checks and MCQs with per-option
@@ -38,18 +39,24 @@ vault only when everything was done, a `mailto:` completion report with a machin
 `WOW-NNN|track|score|max|done`, and the assistant chat. The `AI` object picks the backend: `sample`
 inside Claude, the `PX` proxy client on the public site, or none (friendly fallback).
 
-Track ids are fixed (`younger`, `older`); names come from `KIDS`. In an RTL language every formula is
-wrapped in `<span class="math">` (LTR isolate) and bare/signed numbers in `.num`.
+Track ids are fixed (`younger`, `older`); kids are not — several can share a track, and `pickKid(id)` sets
+`body[data-track]`, `body[data-kid]` and `body[data-level]`, then fills the name pills and the gendered
+strings (`<span data-g="masc|fem">`, `G()`). A kid with `level:'advanced'` sees the `data-level="advanced"`
+twin of the older track's numeric task instead of the `standard` one, gets the chapter-5 challenge panel
+addressed to them (Σ badge via `checkChallenge()`; the others see it as optional), and a pushier assistant
+and grader. In an RTL language every formula is wrapped in `<span class="math">` (LTR isolate) and
+bare/signed numbers in `.num`.
 
 ## Ledger schema
 
 ```
-meta/config      {parent_email, kids_emails[], kids_url, pages_base, github_repo, next_n,
-                  xp_rule, levels, proxy_url, gate_pw_hash}
-kids/younger     {name, streak, best, xp, level, badges[], last_done_date, history[{n,date,score,max,xp,complete}]}
-kids/older       same
+meta/config      {parent_email, kids_emails[], kid_ids[], kids_url, library_url, pages_base, github_repo, next_n,
+                  xp_rule, levels, proxy_url, gate_pw_hash, gate_password?, gate_password_in_kids_email?,
+                  reports:[{name, email, kids[], language}]}      // another parent who gets a daily report on their kids
+kids/<id>        {name, f, age, grade, track, parent_email, streak, best, xp, level, badges[], last_done_date,
+                  history[{n,date,score,max,xp,complete,late?}]}   // one doc per id in config.kid_ids
 editions/eNNN    {n, code "WOW-NNN", date, title, topics[], summary, url (review artifact), pages_url,
-                  password, max_score, reviewed, sent, sent_at, done:{younger:{score,max,at,source}|null, older:…}}
+                  password, max_score, reviewed, sent, sent_at, done:{<kid id>:{score,max,at,source}|null …}}
 menus/eNNN       {n, for_date, options:[{k, title, hook, domains[], try_at_home}], default_k, chosen}
 ```
 

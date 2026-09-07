@@ -46,7 +46,7 @@ fs.writeFileSync(dir + '/_test.html', `<!doctype html><html><head><meta charset=
     for (let i = 0; i < 4; i++) await page.click(`#mcqs .q:nth-child(${i + 1}) .opt[data-i="${answers[i]}"]`);
     for (const id of ['a', 'b', 'c', 'd', 'e']) await page.click(`#order .card[data-id="${id}"]`);
     await page.click('#orderCheck');
-    if (track === 'older') { await page.fill('#numOlder', '40000'); await page.click('.q[data-track=older] .btn'); } else { await page.fill('#numYounger', '10'); await page.click('.q[data-track=younger] .btn'); }
+    if (track === 'older') { await page.fill('#numOlder', '40000'); await page.click('.q[data-track=older][data-level=standard] .btn'); } else { await page.fill('#numYounger', '10'); await page.click('.q[data-track=younger] .btn'); }
     // finish without explanation → vault locked
     await page.click('#finishBtn'); await page.waitForTimeout(600);
     console.log(track, 'locked vault:', await page.$eval('#vaultTitle', e => e.textContent));
@@ -59,6 +59,28 @@ fs.writeFileSync(dir + '/_test.html', `<!doctype html><html><head><meta charset=
     console.log(track, JSON.stringify(await page.evaluate(() => ({ pw: document.querySelector('.vault .pw')?.textContent, xp: document.getElementById('xpToday').textContent, det: document.getElementById('xpDetail').textContent, res: document.getElementById('resLine').textContent, title: document.getElementById('resTitle').textContent, who: document.getElementById('who').textContent, scrollW: document.documentElement.scrollWidth, vw: innerWidth }))));
     await page.click('#fab'); await page.waitForTimeout(300);
     await (await page.$('#chat')).screenshot({ path: dir + `/shots/${track}-chat.png` });
+    await page.close();
+  }
+  // --- advanced level: run only when some kid in KIDS has level:'advanced' (e.g. the commented `dani` example, uncommented)
+  {
+    const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
+    page.on('pageerror', e => errors.push('advanced: ' + e.message));
+    await page.goto('file://' + dir + '/_test.html'); await page.waitForTimeout(400);
+    if (await page.isVisible('#gate')) { await page.fill('#gateIn', process.env.GATE_PW || ''); await page.press('#gateIn', 'Enter'); await page.waitForTimeout(300); }
+    const advId = await page.evaluate(() => Object.keys(KIDS).find(id => KIDS[id].level === 'advanced') || null);
+    if (!advId) console.log('advanced: no kid with level:\'advanced\' in KIDS — skipped');
+    else {
+      await page.click(`.track[data-pick=${advId}]`); await page.click('#startBtn'); await page.waitForTimeout(300);
+      await page.evaluate(() => { for (let s = 2; s <= 7; s++) goTo(s); }); await page.waitForTimeout(300);
+      const vis = await page.evaluate(() => ({ level: document.body.dataset.level, adv: !!document.querySelector('.q[data-level=advanced]')?.offsetParent, std: !!document.querySelector('.q[data-track=older][data-level=standard]')?.offsetParent, heading: document.querySelector('.panel.challenge h3')?.innerText.replace(/\s+/g, ' ').trim() }));
+      console.log('advanced:', JSON.stringify(vis));
+      if (vis.level !== 'advanced' || !vis.adv || vis.std) errors.push('advanced: level twins not swapped ' + JSON.stringify(vis));
+      await page.fill('#chalKm', '39375'); await page.fill('#chalPct', '1.7'); await page.click('.panel.challenge .btn'); await page.waitForTimeout(100);
+      console.log('challenge:', await page.$eval('#chalFb', e => e.textContent.slice(0, 60)), '| S.challenge =', await page.evaluate(() => S.challenge));
+      await page.fill('#numAdv', '90000'); await page.fill('#numAdvR', '14300'); await page.click('.q[data-level=advanced] .btn'); await page.waitForTimeout(100);
+      console.log('advanced numeric:', await page.$eval('#numFbAdv', e => e.textContent.slice(0, 60)), '| S.num =', await page.evaluate(() => S.num));
+      await (await page.$('.panel.challenge')).screenshot({ path: dir + '/shots/advanced-challenge.png' });
+    }
     await page.close();
   }
   console.log('ERRORS:', errors.length ? errors : 'none');
