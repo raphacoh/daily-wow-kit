@@ -60,6 +60,7 @@ XP for a day = `score × 10 + 20 (if complete) + min(50, streak_after × 5)`. Le
 
 - The page is public static HTML. It contains the SHA-256 of the entrance password, the proxy URL, the parent's email (for the completion `mailto:`), the kids' first names, and the day's secret password as reversed base64 (a deterrent, not encryption). No API key, no other personal data.
 - The proxy holds the Anthropic key. It answers only its allowed origin, only with the right password, at most N sessions a day (Redis counter, atomic), M messages per session, and blocks an IP after 10 wrong passwords in an hour. Worst case if the password leaks: 5 × 40 short answers a day, a few cents.
+- An optional second password (`DEMO_PASSWORD`) opens the same proxy for a public demo under its own daily cap; the kids' quota is untouched.
 - Emails never contain the daily password to the kids; the review email to the parent does.
 - The assistant persona is kid-safe by prompt; the proxy also bounds prompt and reply sizes.
 

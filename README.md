@@ -13,7 +13,7 @@ A new topic each day that mixes science, engineering, maths, biology, physics, s
   <img src="docs/img/arto-chat.png" width="49%" alt="The assistant answering a kid's question inside the page">
 </p>
 
-Edition #1 (Hebrew) — *The stick that measured the Earth*, how Eratosthenes found the circumference of the planet with a shadow and a well: **[live demo](https://raphacoh.github.io/daily-wow/e/001/)**.
+**Try it:** [the live demo](https://raphacoh.github.io/daily-wow-kit/demo/) — edition #1 in Hebrew, *The stick that measured the Earth* (how Eratosthenes found the circumference of the planet with a shadow and a well), with the assistant switched on. Entrance password: **`demo`**. The demo shares the maintainer's proxy under its own small daily quota, so if the assistant says it is resting, come back tomorrow — the lesson itself always works.
 
 ## What you get
 
@@ -50,7 +50,7 @@ Prefer to wire things by hand? [`prompts/README.md`](prompts/README.md) document
 - **Kids** — the `KIDS` block at the top of the template holds names, gender, age and grade for the younger and older track; the markup fills itself from it. One kid: build one track.
 - **Length and difficulty** — hard rules in the builder prompt (≈1,100 words per track, 3–4 interactives, 8–10-minute test). Change the numbers, not the structure.
 - **Topics** — the menu prompt describes what makes a good candidate (2–3 domains in one story, a real person, a try-at-home moment, a local hook). Add your own constraints there.
-- **Caps and cost** — `MAX_SESSIONS_PER_DAY`, `MAX_MSGS_PER_SESSION`, `MODEL` on the proxy.
+- **Caps and cost** — `MAX_SESSIONS_PER_DAY`, `MAX_MSGS_PER_SESSION`, `MODEL` on the proxy. A `DEMO_PASSWORD` with its own `DEMO_MAX_SESSIONS_PER_DAY` lets you share a public demo without touching your kids' quota.
 
 ## Repository layout
 
@@ -60,6 +60,7 @@ template/   edition-template.html  the engine + a complete edition (Hebrew demo,
 proxy/      Vercel Functions: api/session, api/chat, api/status + lib/arto.js
 prompts/    setup-prompt.md, topic-menu.md, nightly-builder.md, release-routine.md, README.md
 docs/       architecture.md, img/
+demo/       the hosted demo (edition #1 with generic names, pointed at the maintainer's proxy) — delete or repoint it in your fork
 ```
 
 ## FAQ

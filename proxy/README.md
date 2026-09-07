@@ -41,6 +41,8 @@ Your page's `PROXY.url` is then `https://<project>.vercel.app/api`.
 | `MAX_MSGS_PER_SESSION` | no | default `40` |
 | `MODEL` | no | default `claude-sonnet-5` |
 | `TIMEZONE` | no | default `Asia/Jerusalem` — the day boundary for the cap |
+| `DEMO_PASSWORD` | no | a second, public password (e.g. `demo`) for a shared demo page; counted separately |
+| `DEMO_MAX_SESSIONS_PER_DAY` | no | default `10` — cap for the demo password |
 
 Upstash's integration injects `KV_REST_API_URL` / `KV_REST_API_TOKEN` (the `UPSTASH_REDIS_REST_*`
 spelling is accepted too). Without a store the functions refuse to run, so the cap can never be silently off.

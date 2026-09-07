@@ -1,0 +1,4 @@
+node_modules
+template/_test.html
+template/shots/
+.DS_Store

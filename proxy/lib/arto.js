@@ -1,5 +1,5 @@
 /**
- * ארטו proxy — shared logic for the three Vercel Functions in /api.
+ * Assistant proxy — shared logic for the three Vercel Functions in /api.
  *
  * Lets your public GitHub Pages site talk to Claude
  * without exposing the API key, gated by the kids' password and hard daily caps.
@@ -8,7 +8,9 @@
  *   ANTHROPIC_API_KEY      (sensitive) your Anthropic API key
  *   PASSWORD               the kids' entrance password, e.g. "sunshine42"
  *   ALLOWED_ORIGINS        REQUIRED, comma-separated — your GitHub Pages origin, e.g. "https://yourname.github.io"
- *   MAX_SESSIONS_PER_DAY   optional, default 5   (a session = one device using ארטו or the grader that day)
+ *   MAX_SESSIONS_PER_DAY   optional, default 5   (a session = one device using the assistant or the grader that day)
+ *   DEMO_PASSWORD          optional — a second, public password for a demo page; its sessions are counted separately
+ *   DEMO_MAX_SESSIONS_PER_DAY  optional, default 10 (cap for the demo password)
  *   MAX_MSGS_PER_SESSION   optional, default 40
  *   MODEL                  optional, default "claude-sonnet-5"
  *   TIMEZONE               optional, default "Asia/Jerusalem" (day boundary for the cap)
@@ -20,12 +22,13 @@
  * Endpoints (POST JSON; CORS restricted to ALLOWED_ORIGINS):
  *   /api/session  {password}                            -> {token, sessionsLeft, day}
  *   /api/chat     {token, system, messages, max_tokens} -> {text, msgsLeft}
- *   /api/status   {}                                    -> {day, sessionsUsed, sessionsLeft, store, model, configured}
+ *   /api/status   {}                                    -> {day, sessionsUsed, sessionsLeft, store, model, configured, demo?}
  */
 
 const DEFAULTS = {
   ALLOWED_ORIGINS: '',
   MAX_SESSIONS_PER_DAY: 5,
+  DEMO_MAX_SESSIONS_PER_DAY: 10,
   MAX_MSGS_PER_SESSION: 40,
   MODEL: 'claude-sonnet-5',
   TIMEZONE: 'Asia/Jerusalem',
@@ -78,20 +81,24 @@ async function session(body, env, cfg, cors, ip, kv) {
   const fails = Number(await kv.get(failKey)) || 0;
   if (fails >= Number(cfg.MAX_PASSWORD_FAILS_PER_HOUR)) return json({ error: 'too_many_attempts' }, 429, cors);
 
-  const ok = await safeEqual(String(body.password || ''), String(env.PASSWORD));
+  const pw = String(body.password || '');
+  const isDemo = !!env.DEMO_PASSWORD && await safeEqual(pw, String(env.DEMO_PASSWORD));
+  const ok = isDemo || await safeEqual(pw, String(env.PASSWORD));
   if (!ok) {
     await kv.incr(failKey, 3600);
     return json({ error: 'wrong_password' }, 401, cors);
   }
 
   const day = localDay(cfg.TIMEZONE);
-  const max = Number(cfg.MAX_SESSIONS_PER_DAY);
-  const used = await kv.incr(`day:${day}`, 3 * 86400);          // atomic: nobody can slip past the cap
-  if (used > max) { await kv.decr(`day:${day}`); return json({ error: 'daily_limit', sessionsLeft: 0, day }, 429, cors); }
+  const scope = isDemo ? 'demo' : 'kids';
+  const max = Number(isDemo ? cfg.DEMO_MAX_SESSIONS_PER_DAY : cfg.MAX_SESSIONS_PER_DAY);
+  const dayKey = isDemo ? `demo:day:${day}` : `day:${day}`;
+  const used = await kv.incr(dayKey, 3 * 86400);                 // atomic: nobody can slip past the cap
+  if (used > max) { await kv.decr(dayKey); return json({ error: 'daily_limit', sessionsLeft: 0, day, scope }, 429, cors); }
 
   const token = crypto.randomUUID() + '-' + crypto.randomUUID().slice(0, 8);
-  await kv.set(`sess:${token}`, JSON.stringify({ msgs: 0, day, created: Date.now() }), Number(cfg.SESSION_TTL_SECONDS));
-  return json({ token, sessionsLeft: max - used, day }, 200, cors);
+  await kv.set(`sess:${token}`, JSON.stringify({ msgs: 0, day, scope, created: Date.now() }), Number(cfg.SESSION_TTL_SECONDS));
+  return json({ token, sessionsLeft: max - used, day, scope }, 200, cors);
 }
 
 async function chat(body, env, cfg, cors, kv) {
@@ -145,10 +152,15 @@ async function chat(body, env, cfg, cors, kv) {
 
 async function status(env, cfg, cors, kv) {
   const day = localDay(cfg.TIMEZONE);
-  const used = Math.min(Number(await kv.get(`day:${day}`)) || 0, Number(cfg.MAX_SESSIONS_PER_DAY));
   const max = Number(cfg.MAX_SESSIONS_PER_DAY);
-  return json({ day, sessionsUsed: used, sessionsLeft: Math.max(0, max - used), store: kv.name, model: cfg.MODEL,
-    configured: { password: !!env.PASSWORD, api_key: !!env.ANTHROPIC_API_KEY } }, 200, cors);
+  const used = Math.min(Number(await kv.get(`day:${day}`)) || 0, max);
+  const out = { day, sessionsUsed: used, sessionsLeft: Math.max(0, max - used), store: kv.name, model: cfg.MODEL,
+    configured: { password: !!env.PASSWORD, api_key: !!env.ANTHROPIC_API_KEY, demo: !!env.DEMO_PASSWORD } };
+  if (env.DEMO_PASSWORD) {
+    const dmax = Number(cfg.DEMO_MAX_SESSIONS_PER_DAY), dused = Math.min(Number(await kv.get(`demo:day:${day}`)) || 0, dmax);
+    out.demo = { sessionsUsed: dused, sessionsLeft: Math.max(0, dmax - dused) };
+  }
+  return json(out, 200, cors);
 }
 
 /* ---------- Upstash Redis over REST (no npm dependency) ---------- */
