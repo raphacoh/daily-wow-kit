@@ -24,7 +24,7 @@ A new topic each day that mixes science, engineering, maths, biology, physics, s
 
 ## How it works, in one minute
 
-An AI agent (Claude) runs three schedules. In the morning it emails you five topic ideas for tomorrow; you reply with a number or your own idea, or you don't. At night it settles yesterday's results (who finished — streaks and XP), builds the new edition from yesterday's page as a template, tests it in a headless browser, hands it to a separate reviewer agent that plays the kids and a strict teacher until it passes, then emails you a review (story, learning goals, test answers, today's password) and prepares the kids' email. Late morning, unless you replied HOLD or asked for changes, the release job pushes the page to GitHub Pages and sends the kids their email. The kids open one bookmark, type the family password once per device, and go. When one of them tells you the daily password, you reply `✓ Name` — that feeds the streak.
+An AI agent (Claude) runs three schedules. In the morning it emails you five topic ideas for tomorrow; you reply with a number or your own idea, or you don't. At night it settles yesterday's results (who finished — streaks and XP), builds the new edition from yesterday's page as a template, tests it in a headless browser, hands it to a separate reviewer agent that plays the kids and a strict teacher until it passes, then emails you a review (story, learning goals, test answers, today's password) and prepares the kids' email. Late morning, unless you replied HOLD or asked for changes, the release job pushes the page to GitHub Pages and sends the kids their email. The kids open the day's link (every edition keeps its own URL forever; a library page lists them all, so a missed day can be finished later — full XP, no streak), type the family password once per device, and go. When one of them tells you the daily password, you reply `✓ Name` — that feeds the streak.
 
 ## What you need
 
@@ -56,6 +56,7 @@ Prefer to wire things by hand? [`prompts/README.md`](prompts/README.md) document
 
 ```
 template/   edition-template.html  the engine + a complete edition (Hebrew demo, generic names)
+            library.html           the site's e/index.html — lists every edition from editions.json
             check.js               Playwright click-through of both tracks
 proxy/      Vercel Functions: api/session, api/chat, api/status + lib/arto.js
 prompts/    setup-prompt.md, topic-menu.md, nightly-builder.md, release-routine.md, README.md

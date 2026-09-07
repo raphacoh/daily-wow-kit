@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>הוואו היומי · כל הגיליונות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;500;700&display=swap">
+<style>
+:root{color-scheme:light dark;--bg:#FBF5E6;--card:#FFFFFF;--ink:#1E2140;--muted:#5D6078;--sun:#F4A100;--sun-deep:#B86F00;--sun-soft:#FFE7B3;--line:#E9DFC6;--nile:#167C8A}
+@media (prefers-color-scheme:dark){:root{--bg:#141930;--card:#1E2443;--ink:#F4EEDD;--muted:#B7BAD0;--sun:#FFB324;--sun-deep:#FFC757;--sun-soft:#4A3A12;--line:#343B62;--nile:#5BC7D4}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Rubik,"Noto Sans Hebrew",Arial,sans-serif;font-size:18px;line-height:1.6}
+header{position:sticky;top:0;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.in{max-width:760px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Secular One",Rubik,sans-serif;font-size:1.15rem}
+.disc{width:22px;height:22px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 4px var(--sun-soft)}
+main{max-width:760px;margin:0 auto;padding:24px 20px 80px}
+h1{font-family:"Secular One",Rubik,sans-serif;font-weight:400;font-size:clamp(1.8rem,6vw,2.6rem);margin:0 0 6px}
+.lede{color:var(--muted);margin:0 0 22px}
+.list{display:grid;gap:12px}
+a.card{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;transition:transform .08s,border-color .2s}
+a.card:hover{transform:translateY(-1px);border-color:var(--sun)}
+.n{width:46px;height:46px;border-radius:50%;background:var(--sun-soft);color:var(--sun-deep);display:grid;place-items:center;font-weight:700;font-variant-numeric:tabular-nums;direction:ltr}
+.card b{font-size:1.1rem;display:block}
+.card small{color:var(--muted)}
+.card .go{color:var(--nile);white-space:nowrap}
+.today{border-color:var(--sun);box-shadow:0 0 0 3px var(--sun-soft)}
+.pill{display:inline-block;background:var(--sun);color:#1E2140;border-radius:999px;padding:1px 10px;font-size:.8rem;font-weight:700;margin-inline-start:8px}
+.note{margin-top:26px;padding:14px 16px;background:var(--card);border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:.95rem}
+.err{color:var(--muted)}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header><div class="in"><span class="disc"></span><span class="brand">הוואו היומי</span><span style="color:var(--muted)">· כל הגיליונות</span></div></header>
+<main>
+  <h1>ספריית הגיליונות</h1>
+  <p class="lede">כל גיליון נשאר כאן לתמיד. פספסתם יום? אפשר להשלים אותו מתי שרוצים — הנקודות נספרות, והסיסמה הסודית של אותו יום עדיין עובדת.</p>
+  <div class="list" id="list"><p class="err">טוענים את הרשימה…</p></div>
+  <div class="note">השלמה מאוחרת נותנת XP מלא על הגיליון, אבל לא נספרת ברצף הימים — הרצף נבנה רק מהגיליון של היום. <a href="../">לגיליון של היום ›</a></div>
+</main>
+<script>
+(async () => {
+  const list = document.getElementById('list');
+  const heDate = iso => { const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d).toLocaleDateString('he-IL', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); };
+  try {
+    const r = await fetch('../editions.json', { cache:'no-store' });
+    if (!r.ok) throw new Error('http ' + r.status);
+    const eds = (await r.json()).slice().sort((a,b) => b.n - a.n);
+    if (!eds.length) { list.innerHTML = '<p class="err">עוד אין גיליונות.</p>'; return; }
+    const today = new Date().toLocaleDateString('en-CA');
+    list.innerHTML = eds.map((e,i) => {
+      const path = (e.path || ('e/' + String(e.n).padStart(3,'0') + '/')).replace(/^e\//, '');
+      const isToday = e.date === today, isLatest = i === 0;
+      return `<a class="card${isLatest ? ' today' : ''}" href="${path}">
+        <span class="n">${e.n}</span>
+        <span><b>${esc(e.title || 'גיליון ' + e.n)}${isToday ? '<span class="pill">היום</span>' : isLatest ? '<span class="pill">האחרון</span>' : ''}</b><small>${heDate(e.date)}</small></span>
+        <span class="go">לגיליון ›</span></a>`;
+    }).join('');
+  } catch (err) {
+    list.innerHTML = '<p class="err">לא הצלחנו לטעון את הרשימה. נסו לרענן — או פתחו את <a href="../">הגיליון של היום</a>.</p>';
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+})();
+</script>
+</body>
+</html>

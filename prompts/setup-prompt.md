@@ -3,7 +3,7 @@
 **Before pasting (15 minutes, once):**
 
 1. You need Claude with **Cowork** and the **Gmail connector** connected to your (the parent's) Gmail, plus access to **Claude Code routines** (claude.ai/code/routines) — same subscription.
-2. On GitHub, create a **public** repository named **`daily-wow`** (GitHub Pages from a private repo needs a paid GitHub plan), add an empty file so it has a `main` branch, and enable **Settings → Pages → Deploy from a branch → main / (root)**. Your kids' site will be `https://<your-username>.github.io/daily-wow/`.
+2. On GitHub, create a **public** repository named **`daily-wow`** (GitHub Pages from a private repo needs a paid GitHub plan), add the kit's `template/library.html` as `e/index.html` (the library of past editions) and an empty `.nojekyll`, and enable **Settings → Pages → Deploy from a branch → main / (root)**. Your kids' site will be `https://<your-username>.github.io/daily-wow/`.
 3. Deploy the assistant proxy from this kit's `proxy/` folder on Vercel (10 minutes, free — see `proxy/README.md`). Note the production URL and the password you chose.
 4. Fill in every `[bracket]` in the block below, paste the whole block (from `=== PROMPT START ===` to `=== PROMPT END ===`) as your first message, and answer Claude's few questions. It will build edition #1, set up the automation, and email you the first review.
 5. Do the one-time things in the checklist at the bottom (mainly: create the release routine by pasting a prompt Claude will hand you, and give the kids the password).
@@ -49,7 +49,7 @@ Before publishing ANY edition, spawn a separate **reviewer agent** that plays ea
 
 ## 3. Infrastructure (once)
 
-- **Public site:** GitHub Pages from `[username]/daily-wow`. Root `index.html` = today's edition (the kids' only bookmark); archive at `e/NNN/index.html`; `editions.json` at the root lists released editions `{n, date, title, path}`; `.nojekyll` present. Only the release routine pushes.
+- **Public site:** GitHub Pages from `[username]/daily-wow`. Root `index.html` = today's edition (the kids' bookmark); every edition lives forever at `e/NNN/index.html` and the kids' email links to that permanent URL; `e/index.html` is the **library page** (the kit's `template/library.html`, copied once — it lists every edition from `editions.json`, so kids can find and finish old lessons; a late completion earns XP but not streak); `editions.json` at the root lists released editions `{n, date, title, path}`; `.nojekyll` present. Only the release routine pushes.
 - **Review copies:** each edition is also published as a dated Claude artifact with the `sample` capability — my private review copy and the template for the next day.
 - **Parents' dashboard:** a private artifact declaring the `db` capability; it renders the ledger live (streaks, XP, badges, passwords, completions, editions) and its database IS the ledger. Do not declare `db` on kids' pages.
 - **Ledger schema:** `meta/config` {parent_email, kids_emails[], kids_url, pages_base, github_repo, next_n, xp_rule, levels, proxy_url, gate_pw_hash}; `kids/younger`, `kids/older` {name, streak, best, xp, level, badges[], last_done_date, history[]}; `editions/eNNN` {n, code "WOW-NNN", date, title, topics[], summary, url, pages_url, password, max_score, reviewed, sent, sent_at, done:{younger, older}}; `menus/eNNN` {n, for_date, options[5], default_k, chosen}.

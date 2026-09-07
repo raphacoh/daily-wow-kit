@@ -17,6 +17,8 @@ const PROXY   = { url:'https://<project>.vercel.app/api', pwHash:'<sha256 hex of
 
 Empty `PROXY` = no entrance gate and no assistant on the public site (the page still works, with a self-check rubric).
 
+`library.html` is the static **library page** for the site repo (`e/index.html`): it reads `../editions.json` and lists every edition, newest first, so kids can open and finish old lessons. Copy it once; the release job never touches it.
+
 ## Check it
 
 ```
@@ -35,3 +37,4 @@ errors are ignored). Use it as the model for the nightly builder's own check.
 - Every formula in an RTL page is inside `<span class="math">` (LTR isolate); bare/signed numbers in `.num`.
 - The vault opens only when all four test parts are done; the completion mail carries `WOW-NNN|track|score|max|done`.
 - The proxy client (`PX`) and the backend switch (`AI`) time out and fall back — never leave a kid staring at a spinner.
+- `LATE` (device date > `EDITION.date`) turns a finished old edition into a late completion: full XP for the score and for finishing, no streak bonus, no streak badges, and the completion line ends in `|late` so the builder can tell. The `.libLink` anchors point at the library (`../` from an archived copy, `e/` from the root) and hide inside Claude.

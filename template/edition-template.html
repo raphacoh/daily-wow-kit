@@ -77,6 +77,7 @@ main{max-width:760px;margin:0 auto;padding:0 20px 120px}
 @media (max-width:640px){.hero .sun{width:150px;height:150px;left:-20px;top:70px;opacity:.75}}
 .eyebrow{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:.95rem;margin-bottom:14px;flex-wrap:wrap}
 .eyebrow .tag{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px}
+.eyebrow a.tag{text-decoration:none;color:inherit;border-color:var(--sun)}
 .lede{font-size:1.2rem;max-width:34em;margin-top:18px}
 .lede b{color:var(--sun-deep)}
 
@@ -270,7 +271,7 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
 <!-- 0 · HERO -->
 <section class="step hero shown" data-step="0">
   <div class="sun" aria-hidden="true"></div>
-  <div class="eyebrow"><span class="tag">גיליון 1</span><span class="tag">יום שני, 7 בספטמבר 2026</span><span class="tag">כ־25 דקות</span></div>
+  <div class="eyebrow"><span class="tag">גיליון 1</span><span class="tag">יום שני, 7 בספטמבר 2026</span><span class="tag">כ־25 דקות</span><a class="tag libLink" href="e/" hidden>כל הגיליונות ›</a></div>
   <h1>המקל שמדד את כדור הארץ</h1>
   <p class="lede">לפני 2,200 שנה — בלי לוויינים, בלי מטוסים, בלי מחשבון — איש אחד במצרים מדד את <b>כל כדור הארץ</b>. הציוד שלו: מקל, צל, וקצת חשיבה גאונית. היום תעשו את זה בעצמכם.</p>
 
@@ -599,6 +600,7 @@ body[data-track=older] .msg.me{background:var(--shadow-soft)}
     <a class="btn" id="mailBtn" href="#" target="_blank" rel="noopener" style="text-decoration:none">שלחו את התוצאה לאבא במייל</a>
     <button class="btn ghost" onclick="copyResults()">או העתיקו לוואטסאפ</button>
     <button class="btn ghost small" onclick="restart()">להתחיל מחדש</button>
+    <a class="btn ghost small libLink" href="e/" hidden style="text-decoration:none">כל הגיליונות ›</a>
   </div>
   <details class="src"><summary>למבוגרים: מקורות ודיוק</summary>
     <p>הסיפור המקובל על הבאר בסיינה והמדידה של ארטוסתנס מגיע בעיקר מקליאומדס (Cleomedes, "על תנועת גרמי השמיים"). הנתונים: זווית של 1/50 מעגל (7.2°), מרחק של 5,000 סטדיון, היקף 250,000 סטדיון (ויש גרסאות עם 252,000). התרגום לקילומטרים תלוי באורך הסטדיון (157.5 מ׳ או ~185 מ׳), ומכאן סטייה של 1%–16% מההיקף האמיתי (40,075 ק״מ בקו המשווה, 40,008 ק״מ דרך הקטבים). הבמטיסטים כמדידת המרחק — ההסבר המקובל, אך לא ודאי. גודל הירח: אריסטרכוס העריך כשליש מכדור הארץ; הערך המדויק כרבע. מקורות להעמקה: Wikipedia — Eratosthenes; Britannica — Eratosthenes; NASA Earth Fact Sheet. חישובי הצל לתל אביב (32.08°N): נטיית השמש בקיץ 23.4° → זווית זניט 9.1° בצהרי 21 ביוני (צל ≈ 5 ס״מ למקל 30 ס״מ); בתחילת ספטמבר כ־26° (≈ 15 ס״מ).</p>
@@ -648,6 +650,7 @@ const LEVELS = [ [0,'סקרן','סקרנית'], [150,'חוקר צעיר','חוק
 /* public-site access: PROXY.url = the assistant proxy (Vercel Functions; config.proxy_url, ends with /api); PROXY.pwHash = SHA-256 hex of the kids' entrance password (config.gate_pw_hash).
    Both empty → no gate, ארטו only inside Claude. The gate never shows inside the Claude viewer. */
 const PROXY = { url:'', pwHash:'' };
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use==='function');   // opened inside Claude (review copy) vs. the public site
 
 /* ---------- state ---------- */
 const S = { track:null, started:false, step:0, guess:20000, world:'flat', qc:{}, mcq:{}, order:[], orderScore:null, num:null, explain:0, explainText:'', slices:0, sieveDone:false, explainGraded:false, olderStep1:false };
@@ -663,6 +666,11 @@ document.querySelectorAll('.track').forEach(b=>{ const k=KIDS[b.dataset.pick]; i
 document.querySelectorAll('[data-kidname]').forEach(el=>{ const k=KIDS[el.dataset.kidname]; if(k) el.textContent=k.name; });
 document.querySelectorAll('[data-kidpill]').forEach(el=>{ const k=KIDS[el.dataset.kidpill]; if(k) el.textContent='המסלול של '+k.name; });
 document.getElementById('gateNames').textContent = Object.values(KIDS).map(k=>'ל'+k.name).join(' ו');
+/* the library of past editions lives at <site>/e/ — from an archived copy (…/e/NNN/) that is ../, from the root it is e/ */
+const LIB_URL = /\/e\/\d{3}\/?(index\.html)?$/.test(location.pathname) ? '../' : 'e/';
+document.querySelectorAll('.libLink').forEach(a=>{ a.href=LIB_URL; a.hidden=IN_CLAUDE; });
+const TODAY = new Date().toLocaleDateString('en-CA');                                     // YYYY-MM-DD, device local time
+const LATE = TODAY > EDITION.date;                                                        // an old edition completed on a later day: XP yes, streak no
 function decodePw(){ try{ return decodeURIComponent(escape(atob(PW_ENC))).split('').reverse().join(''); }catch(e){ return '—'; } }
 function levelFor(xp, f){ let L=LEVELS[0], i=0; LEVELS.forEach((l,k)=>{ if(xp>=l[0]){ L=l; i=k; } }); return { i, name: f?L[2]:L[1], next: LEVELS[i+1]?LEVELS[i+1][0]:null }; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -703,7 +711,6 @@ function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg
 
 /* ---------- entrance gate (public site) ---------- */
 const GATE_KEY='wow-gate';
-const IN_CLAUDE = !!(window.claude && typeof window.claude.use==='function');
 async function sha256(s){ const b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 function gatePw(){ try{ return localStorage.getItem(GATE_KEY)||''; }catch(e){ return ''; } }
 async function gateCheck(){
@@ -1104,31 +1111,31 @@ function finish(){
 
   /* XP & level (same formula the nightly bot uses) */
   const st = STATS[S.track]||{streak:0,best:0,xp:0,badges:[]};
-  const streakAfter = complete ? st.streak+1 : st.streak;
-  const xpBase = total*10, xpDone = complete?20:0, xpStreak = complete?Math.min(50, streakAfter*5):0, xpToday = xpBase+xpDone+xpStreak;
+  const streakAfter = (complete && !LATE) ? st.streak+1 : st.streak;
+  const xpBase = total*10, xpDone = complete?20:0, xpStreak = (complete && !LATE)?Math.min(50, streakAfter*5):0, xpToday = xpBase+xpDone+xpStreak;
   document.getElementById('xpToday').textContent='+'+xpToday;
-  xpDetail.innerHTML='<span class="math">'+total+' × 10 = '+xpBase+'</span> על הנקודות'+(complete?' · <span class="math">+20</span> על סיום המבחן · <span class="math">+'+xpStreak+'</span> בונוס רצף':' · (בונוס מחכה למי שמסיים את המבחן)');
+  xpDetail.innerHTML='<span class="math">'+total+' × 10 = '+xpBase+'</span> על הנקודות'+(complete?' · <span class="math">+20</span> על סיום המבחן'+(LATE?' · השלמה מאוחרת — בלי בונוס רצף':' · <span class="math">+'+xpStreak+'</span> בונוס רצף'):' · (בונוס מחכה למי שמסיים את המבחן)');
   const xpTotal = st.xp+xpToday, lv=levelFor(xpTotal,F()), prevLv=levelFor(st.xp,F());
   const span = lv.next? (lv.next-LEVELS[lv.i][0]) : 1, into = lv.next? (xpTotal-LEVELS[lv.i][0]) : 1;
   setTimeout(()=>{ xpBar.style.width=Math.round(into/span*100)+'%'; },200);
   xpLevel.innerHTML = 'סה״כ <b class="num">'+xpTotal+'</b> XP · רמה '+(lv.i+1)+': <b>'+lv.name+'</b>'+(lv.next?' · עוד <span class="num">'+(lv.next-xpTotal)+'</span> XP לרמה הבאה':' · הרמה הגבוהה ביותר!')+(lv.i>prevLv.i?' — <b>עלית רמה היום!</b>':'');
 
   /* streak: last 7 days, labelled by day of month */
-  streakLine.innerHTML = complete ? '<b class="num">'+streakAfter+'</b> '+(streakAfter===1?'יום ברצף — ההתחלה!':'ימים ברצף!') : 'הרצף שלך: <b class="num">'+st.streak+'</b> · היום עוד לא נספר — '+G('סיים','סיימי')+' את המבחן.';
-  const row=document.getElementById('streakRow'); row.innerHTML='';
+  streakLine.innerHTML = LATE ? 'זה גיליון מ־<b class="num">'+EDITION.date.split('-').reverse().join('.')+'</b>. השלמה מאוחרת נותנת XP, אבל לא נספרת ברצף — הרצף נבנה מהגיליון של היום.' : complete ? '<b class="num">'+streakAfter+'</b> '+(streakAfter===1?'יום ברצף — ההתחלה!':'ימים ברצף!') : 'הרצף שלך: <b class="num">'+st.streak+'</b> · היום עוד לא נספר — '+G('סיים','סיימי')+' את המבחן.';
+  const row=document.getElementById('streakRow'); row.innerHTML=''; row.hidden=LATE;
   const base=new Date(EDITION.date+'T12:00:00');
   for(let i=6;i>=0;i--){ const d=new Date(base); d.setDate(base.getDate()-i); const s=document.createElement('span'); const hit = i===0 ? complete : (i<=st.streak); s.innerHTML='<span>'+(i===0?'היום':d.getDate()+'.'+(d.getMonth()+1))+'</span>'; if(hit) s.classList.add('hit'); if(i===0) s.classList.add('today'); row.appendChild(s); }
   const nextMilestone=[3,7,14,30,100].find(m=>m>streakAfter);
-  streakNext.textContent = complete ? (nextMilestone?'עוד '+(nextMilestone-streakAfter)+' ימים לתג "רצף '+nextMilestone+'". מחר יש גיליון חדש!':'רצף אגדי.') : '';
+  streakNext.textContent = LATE ? '' : complete ? (nextMilestone?'עוד '+(nextMilestone-streakAfter)+' ימים לתג "רצף '+nextMilestone+'". מחר יש גיליון חדש!':'רצף אגדי.') : '';
 
   /* badges */
   const earned=[];
-  if(complete && st.streak===0) earned.push(['1','היום הראשון']);
+  if(complete && !LATE && st.streak===0) earned.push(['1','היום הראשון']);
   if(mcq===MCQ_N) earned.push(['✓','בלי טעויות']);
   if(ex===3) earned.push(['★','המורה']);
   if(diff<0.15) earned.push(['≈','ניחוש חד']);
   if(S.sieveDone) earned.push(['ר','המסננת']);
-  if(complete && [3,7,14,30,100].includes(streakAfter)) earned.push(['🔥','רצף '+streakAfter]);
+  if(complete && !LATE && [3,7,14,30,100].includes(streakAfter)) earned.push(['🔥','רצף '+streakAfter]);
   badgesTitle.textContent='תגים שזכית בהם היום';
   const bb=document.getElementById('badges'); bb.innerHTML = earned.map(b=>'<span class="badge new"><span class="dot">'+b[0]+'</span>'+b[1]+'</span>').join('');
   badgeNone.textContent = earned.length? '' : 'עוד לא — תגים מחכים למי שמסיים בלי טעויות, מסביר כמו מורה, או שומר על רצף.';
@@ -1139,7 +1146,7 @@ function finish(){
 }
 function summaryText(){
   const r=S.result||{total:0,max:11,pct:0}, g=S.game||{};
-  return 'הוואו היומי #'+EDITION.n+' · '+EDITION.title+'\n'+NAME()+': '+r.total+'/'+r.max+' נקודות ('+r.pct+'%)'+(g.complete?' · המבחן הושלם ✓':' · המבחן לא הושלם')+'\nXP היום: +'+(g.xpToday||0)+(g.badges&&g.badges.length?' · תגים: '+g.badges.join(', '):'')+'\nהניחוש שלי להיקף כדור הארץ: '+fmt(S.guess)+' ק״מ (המציאות: 40,075)\n'+(S.explainText?'ההסבר שלי: '+S.explainText+'\n':'')+'\n'+EDITION.code+'|'+(S.track||'')+'|'+r.total+'|'+r.max+'|'+(g.complete?'done':'partial');
+  return 'הוואו היומי #'+EDITION.n+' · '+EDITION.title+'\n'+NAME()+': '+r.total+'/'+r.max+' נקודות ('+r.pct+'%)'+(g.complete?' · המבחן הושלם ✓':' · המבחן לא הושלם')+'\nXP היום: +'+(g.xpToday||0)+(g.badges&&g.badges.length?' · תגים: '+g.badges.join(', '):'')+'\nהניחוש שלי להיקף כדור הארץ: '+fmt(S.guess)+' ק״מ (המציאות: 40,075)\n'+(S.explainText?'ההסבר שלי: '+S.explainText+'\n':'')+'\n'+EDITION.code+'|'+(S.track||'')+'|'+r.total+'|'+r.max+'|'+(g.complete?'done':'partial')+(LATE?'|late':'');
 }
 async function copyResults(){
   const txt=summaryText();

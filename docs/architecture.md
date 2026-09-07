@@ -16,7 +16,7 @@ Everything is built so that **no server of yours is ever needed** for the site i
 
 | Piece | Lives in | Notes |
 |---|---|---|
-| **Edition page** | `daily-wow` repo → GitHub Pages | one self-contained HTML file per day; root `index.html` = today, `e/NNN/` = archive, `editions.json` = release record |
+| **Edition page** | `daily-wow` repo → GitHub Pages | one self-contained HTML file per day; root `index.html` = today, `e/NNN/` = permanent archive (the URL the kids' email uses), `e/index.html` = library page listing every edition, `editions.json` = release record |
 | **Template** | `template/edition-template.html` | the engine every edition inherits: tracks, stations, quiz renderers, dictation, vault, XP/levels/badges, assistant chat, entrance gate, proxy client |
 | **Assistant proxy** | Vercel Functions + Upstash Redis | password gate, 5 sessions/day, 40 msgs/session, CORS to your Pages origin, forwards to the Anthropic API |
 | **Ledger** | database of a private Claude artifact (the parents' dashboard) | kids' stats, editions, menus, config — read/written with the Artifact tool |
@@ -54,7 +54,9 @@ menus/eNNN       {n, for_date, options:[{k, title, hook, domains[], try_at_home}
 ```
 
 XP for a day = `score × 10 + 20 (if complete) + min(50, streak_after × 5)`. Levels at 0 / 150 / 400 /
-800 / 1500 / 2500 / 4000 XP. A missed day resets the streak to 0 (best is kept).
+800 / 1500 / 2500 / 4000 XP. A missed day resets the streak to 0 (best is kept). An old edition finished
+later (a **late completion**, `|late` in the completion line) earns `score × 10 + 20` and marks the edition done,
+but never touches the streak — so nothing is lost, and the streak still means "every day".
 
 ## Security model
 
