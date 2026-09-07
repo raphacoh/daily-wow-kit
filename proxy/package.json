@@ -1,0 +1,6 @@
+{
+  "name": "arto-proxy",
+  "private": true,
+  "type": "module",
+  "description": "Daily Wow assistant proxy — password-gated, capped bridge from the public site to Claude"
+}
