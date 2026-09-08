@@ -1259,4 +1259,23 @@ document.addEventListener('focusout', e=>{ if(e.target.matches('input, textarea'
 restore(); paintProgress(); drawSticks(); gateCheck();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{ drawShip(); drawSticks(); if(S.step>=3) drawPizza(); if(S.step>=5){ drawRays(); } });
 </script>
+<!-- Roots and Wings: this demo is public; every screen says where the daily lesson comes from -->
+<style>
+.rw-cta{margin:28px 0 6px;padding:12px 16px;border:1px dashed var(--sand);border-radius:12px;background:var(--card2);font-size:.95rem;line-height:1.6;color:var(--ink)}
+.rw-cta a{color:var(--ink);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.rw-cta.big{border-style:solid;border-color:var(--sun);background:var(--sun-soft);font-size:1.05rem;padding:16px 18px}
+.rw-cta.big .btn{display:inline-block;margin-top:10px;text-decoration:none}
+</style>
+<script>
+(function(){
+  var URL='https://rootsandwings-edu.com';
+  var line='אהבתם? שיעור כזה מגיע כל בוקר למייל, עם קישור אישי לכל ילד/ה — חינם, בלי פרסומות. <a href="'+URL+'" target="_blank" rel="noopener">rootsandwings-edu.com</a>';
+  document.querySelectorAll('.step').forEach(function(sec){
+    var el=document.createElement('div'); el.className='rw-cta';
+    if(sec.dataset.step==='8'){ el.className+=' big'; el.innerHTML='<b>רוצים שיעור כזה כל יום?</b><br>ב"שורשים וכנפיים" כל בוקר יוצא גיליון חדש — סיפור אמיתי, סימולציות, מבחן קצר וסיסמה סודית — ומגיע למייל עם קישור אישי לכל ילד/ה. חינם.<br><a class="btn" href="'+URL+'/join" target="_blank" rel="noopener">להצטרף — rootsandwings-edu.com</a>'; }
+    else { el.innerHTML=line; }
+    sec.appendChild(el);
+  });
+})();
+</script>
 </body></html>
